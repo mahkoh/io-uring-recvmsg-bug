@@ -1,7 +1,7 @@
 #![expect(clippy::len_zero, clippy::needless_late_init)]
 
 use {
-    io_uring::{IoUring, opcode::RecvMsg, types::Fd},
+    io_uring::{IoUring, cqueue, opcode::RecvMsg, squeue, types::Fd},
     std::{
         fs,
         mem::MaybeUninit,
@@ -23,7 +23,11 @@ fn main() {
         const SO_INQ: i32 = 84;
         uapi::setsockopt(socket.as_raw_fd(), c::SOL_SOCKET, SO_INQ, &1i32).unwrap();
     }
-    let mut uring = IoUring::new(32).unwrap();
+    let mut uring = IoUring::<squeue::Entry, cqueue::Entry>::builder()
+        .setup_single_issuer()
+        .setup_defer_taskrun()
+        .build(32)
+        .unwrap();
     let mut fds = 0;
     loop {
         data_buf.fill(0);
