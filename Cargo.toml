@@ -1,0 +1,14 @@
+[package]
+name = "io-uring-recvmsg-bug"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+io-uring = "0.7.11"
+uapi = "0.2.13"
+
+[[bin]]
+name = "client"
+
+[[bin]]
+name = "server"
