@@ -19,10 +19,8 @@ fn main() {
     let _ = fs::remove_file("socket");
     let socket = UnixListener::bind("socket").unwrap();
     let (socket, _) = socket.accept().unwrap();
-    if !USE_IO_URING {
-        const SO_INQ: i32 = 84;
-        uapi::setsockopt(socket.as_raw_fd(), c::SOL_SOCKET, SO_INQ, &1i32).unwrap();
-    }
+    const SO_INQ: i32 = 84;
+    uapi::setsockopt(socket.as_raw_fd(), c::SOL_SOCKET, SO_INQ, &1i32).unwrap();
     let mut uring = IoUring::<squeue::Entry, cqueue::Entry>::builder()
         .setup_single_issuer()
         .setup_defer_taskrun()
